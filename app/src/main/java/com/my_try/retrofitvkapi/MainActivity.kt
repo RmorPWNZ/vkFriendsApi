@@ -1,22 +1,21 @@
 package com.my_try.retrofitvkapi
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.AlertDialog
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.my_try.retrofitvkapi.Adapter.MyMovieAdapter
 import com.my_try.retrofitvkapi.Common.Common
 import com.my_try.retrofitvkapi.Interface.RetrofitService
-import android.app.AlertDialog
-import android.util.Log
-import com.my_try.retrofitvkapi.Model.vkFriends
+import com.my_try.retrofitvkapi.Model.*
 import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_main.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
-    lateinit var mService: RetrofitService
     lateinit var layoutManager: LinearLayoutManager
     lateinit var adapter: MyMovieAdapter
     lateinit var dialog: AlertDialog
@@ -24,7 +23,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mService = Common.retrofitService
         recyclerMovieList.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(this)
         recyclerMovieList.layoutManager = layoutManager
@@ -35,16 +33,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun getAllMovieList() {
         dialog.show()
-        mService.getFriendList().enqueue(object : Callback<MutableList<vkFriends>> {
-            override fun onFailure(call: Call<MutableList<vkFriends>>, t: Throwable) {
-                t.printStackTrace()
+
+        val mService: RetrofitService = Common.retrofitService
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = mService.getFriendList()
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful) {
+                    adapter = MyMovieAdapter(baseContext, response.body()?.response?.items as List<Items> )
+                    adapter.notifyDataSetChanged()
+                    recyclerMovieList.adapter = adapter
+                    dialog.dismiss()
+                }
             }
-            override fun onResponse(call: Call<MutableList<vkFriends>>, response: Response<MutableList<vkFriends>>) {
-                adapter = MyMovieAdapter(baseContext, response.body() as MutableList<vkFriends>)
-                adapter.notifyDataSetChanged()
-                recyclerMovieList.adapter = adapter
-                dialog.dismiss()
-            }
-        })
+        }
     }
 }

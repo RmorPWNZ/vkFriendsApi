@@ -8,19 +8,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.my_try.retrofitvkapi.Model.vkFriends
+import com.my_try.retrofitvkapi.Model.*
 import com.my_try.retrofitvkapi.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_layout.view.*
 
-class MyMovieAdapter(private val context: Context, private val friendList: MutableList<vkFriends>): RecyclerView.Adapter<MyMovieAdapter.MyViewHolder>() {
+class MyMovieAdapter(private val context: Context, private val friendList: List<Items>): RecyclerView.Adapter<MyMovieAdapter.MyViewHolder>() {
 
     class MyViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val photo: ImageView = itemView.photo
         val txt_name: TextView = itemView.txt_name
         val txt_last_name: TextView = itemView.txt_last_name
         val txt_id: TextView = itemView.txt_id
-        fun bind(listItem: vkFriends) {
+        fun bind(listItem: Items) {
             photo.setOnClickListener {
                 Toast.makeText(it.context, "нажал на ${itemView.photo}", Toast.LENGTH_SHORT).show()
             }
@@ -42,13 +42,13 @@ class MyMovieAdapter(private val context: Context, private val friendList: Mutab
     override fun getItemCount() = friendList.size
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val listItem: vkFriends = friendList[position]
+        val listItem: Items = friendList[position]
         holder.bind(listItem)
 
-        Picasso.get().load(friendList[position].response?.get(1)?.items?.get(1)?.photo).into(holder.photo)
-        holder.txt_name.text = friendList[position].response?.get(1)?.items?.get(1)?.first_name
-        holder.txt_last_name.text = friendList[position].response?.get(1)?.items?.get(1)?.last_name
-        holder.txt_id.text = friendList[position].response?.get(1)?.items?.get(1)?.id
+        Picasso.get().load(friendList[position].photo).into(holder.photo)
+        holder.txt_name.text = friendList[position].first_name
+        holder.txt_last_name.text = friendList[position].last_name
+        holder.txt_id.text = friendList[position].id?.toString()
     }
 //Parsing nested JSON retrofit
 }

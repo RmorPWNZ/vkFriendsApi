@@ -1,10 +1,14 @@
 package com.my_try.retrofitvkapi.Interface
 
+import com.my_try.retrofitvkapi.Model.People
 import com.my_try.retrofitvkapi.Model.vkFriends
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
+//acces_token should be responded from vk developers redirect url
+// or use this https://mocki.io/v1/85533f74-542c-4336-9419-809280940808 however it can be non-working because it was temporary link
+// or see json file in project src folder
 interface RetrofitService {
-    @GET("friends.get?v=5.52&access_token=a9eefb34dd539ececf2d27d487809d08a244c361651c5eef46a848856014b2e0b17bde680acb40fe30538&fields=photo")
-    fun getFriendList(): Call<MutableList<vkFriends>>
+    @GET("method/friends.get?v=5.52&access_token=PASTE_ACCESS_TOKEN_HERE&fields=photo")
+    suspend fun getFriendList(): Response<vkFriends>
 }
